@@ -224,8 +224,15 @@ app.post("/signup", async (req, res) => {
 });
 
 //creating endpoint for userlogin
+//creating endpoint for userlogin
 app.post("/login", async (req, res) => {
-  let user = await Users.findOne({ email: req.body.email });
+  let user;
+  try {
+    user = await Users.findOne({ email: req.body.email });
+  } catch (err) {
+    return res.json({ success: false, error: "Something went wrong" });
+  }
+
   if (user) {
     const passCompare = req.body.password === user.password;
     if (passCompare) {
@@ -238,14 +245,14 @@ app.post("/login", async (req, res) => {
       res.json({
         success: true,
         token,
-        id: user.id
+        id: user.id,
       });
     } else {
-      res.json({ success: false, error: "Wrong Password" });
+      return res.json({ success: false, error: "Wrong Password" });
     }
   } else {
-    res.json({ success: false, error: "Wrong Email Address" });
-  }
+    return res.json({ success: false, error: "user not found" });
+  }
 });
 
 //creating endpoint for newcollection data
